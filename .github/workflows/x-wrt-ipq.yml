@@ -511,9 +511,14 @@ jobs:
             else
               for p in $FAILED; do
                 case "$p" in
-                  target/linux|package/*)
+                  package/*)
                     echo "===== V=s 复现 $p ====="
                     make -j1 V=s "$p/compile" 2>&1 | tee -a error.log || true ;;
+                  target/linux)
+                    # target/linux 失败可能是 compile，也可能是 install（镜像生成）阶段；
+                    # compile 已重跑过成功时，只有全树 V=s 才能走到 install 失败点拿到真实错误
+                    echo "===== V=s 复现 target/linux（全树跑到失败点） ====="
+                    make -j1 V=s 2>&1 | tee -a error.log || true ;;
                   *)
                     echo "未知失败目标 $p，跳过 V=s";;
                 esac
