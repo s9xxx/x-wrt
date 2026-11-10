@@ -1,4 +1,4 @@
-name: 🛠️ X-Wrt MT798x (filogic) Build
+name: 🛠️ X-Wrt MT798x (filogic) Build-cudy_tr3000-512mb-v1
 
 # 每周三早上 09:00（北京时间）自动编译 = UTC 周三 01:00
 on:
