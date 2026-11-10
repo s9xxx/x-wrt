@@ -12,6 +12,6 @@ define Device/geos
   DEVICE_VENDOR := Traverse Technologies
   DEVICE_MODEL := Geos
   DEVICE_PACKAGES += br2684ctl flashrom kmod-hwmon-lm90 kmod-mppe kmod-pppoa \
-	kmod-usb-ohci-pci linux-atm ppp-mod-pppoa pppdump pppstats soloscli tc
+	kmod-usb-ohci-pci linux-atm ppp-mod-pppoa pppdump pppstats soloscli tc-tiny
 endef
 TARGET_DEVICES += geos
