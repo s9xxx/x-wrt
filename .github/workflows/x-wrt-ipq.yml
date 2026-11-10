@@ -121,13 +121,13 @@ jobs:
 
           def parse_mk(path):
               txt = open(path, encoding="utf-8", errors="replace").read()
-              regs = []
+              regs = {}
               for line in txt.splitlines():
                   if "TARGET_DEVICES" in line and "+=" in line:
                       for tok in re.split(r"[\s\\]+", line.split("+=", 1)[1]):
                           tok = tok.strip()
                           if tok and re.fullmatch(r"[A-Za-z0-9_.\-]+", tok):
-                              regs.append(tok)
+                              regs[tok] = True
               return regs
 
           def symbols_from_meta():
@@ -238,7 +238,7 @@ jobs:
               sys.exit(1)
 
           with open(os.environ["GITHUB_OUTPUT"], "a") as f:
-              f.write("matrix=%s\n" % json.dumps({"include": matrix}, separators=(",", ":")))
+              f.write("matrix=%s\n" % json.dumps(matrix, separators=(",", ":")))  # include: 需要纯数组
               f.write("total=%d\n" % total)
 
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
@@ -269,7 +269,7 @@ jobs:
     needs: prepare
     if: needs.prepare.outputs.matrix != '[]' && needs.prepare.outputs.matrix != ''
     runs-on: ubuntu-24.04
-    timeout-minutes: 400
+    timeout-minutes: 350
     strategy:
       fail-fast: false
       matrix:
