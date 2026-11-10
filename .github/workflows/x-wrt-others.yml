@@ -103,6 +103,8 @@ jobs:
 
           # 已有专门 workflow 覆盖 / 按要求排除的平台
           EXCLUDED_TARGETS = {"mediatek", "qualcommax", "qualcommbe", "ipq806x", "ipq40xx"}
+          # 明确不再编译的子目标（target_subtarget）：x86-geode 按需求移除
+          EXCLUDED_SUBTARGETS = {"x86_geode"}
 
           # curated：常用平台白名单（target/subtarget），其余平台需显式 groups=all
           CURATED = {
@@ -183,8 +185,9 @@ jobs:
               print("::warning::元数据不可用，改用静态解析 image/*.mk 枚举机型")
               pairs = symbols_static()
 
-          # 排除平台
-          pairs = [(c, d) for c, d in pairs if c.split("_", 1)[0] not in EXCLUDED_TARGETS]
+          # 排除平台与明确移除的子目标
+          pairs = [(c, d) for c, d in pairs
+                   if c.split("_", 1)[0] not in EXCLUDED_TARGETS and c not in EXCLUDED_SUBTARGETS]
           print("符号表机型总数（其他平台）: %d" % len(pairs))
 
           def tsub(conf):
