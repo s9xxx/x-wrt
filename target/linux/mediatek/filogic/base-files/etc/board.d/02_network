@@ -85,6 +85,7 @@ mediatek_setup_interfaces()
 	netis,nx32u|\
 	jcg,q30-pro-nmbm|\
 	qihoo,360t7-ubootlayout|\
+	philips,hy3000|\
 	qihoo,360t7|\
 	qihoo,360t7-ubi|\
 	routerich,ax3000|\
@@ -428,6 +429,11 @@ mediatek_setup_macs()
 		label_mac=$lan_mac
 		;;
 	qihoo,360t7-ubootlayout|\
+	philips,hy3000)
+		lan_mac=$(mmc_get_mac_binary factory 0x74)
+		wan_mac=$(macaddr_add "$lan_mac" 1)
+		label_mac=$wan_mac
+		;;
 	qihoo,360t7)
 		lan_mac=$(mtd_get_mac_ascii factory lanMac)
 		[ -n "$lan_mac" ] || return 0
