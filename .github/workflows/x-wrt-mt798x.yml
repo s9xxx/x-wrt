@@ -135,7 +135,6 @@ jobs:
           CONFIG_PACKAGE_luci=y
           CONFIG_DEVEL=y
           CONFIG_CCACHE=y
-          CONFIG_VERSION_DIST="xwrt-$(date +%Y%m%d)"
           EOF
 
           ok=0
@@ -193,13 +192,13 @@ jobs:
           # GitHub Actions 默认以 bash -e 运行，裸管道失败会立刻退出，
           # 必须用 || rc=... 兜住，否则下面的 V=s 诊断逻辑永远执行不到
           rc=0
-          make -j"$(( $(nproc) + 1 ))" 2>&1 | tee build.log || rc=${PIPESTATUS[0]}
+          make VERSION_DIST="xwrt-$(date +%Y%m%d)" -j"$(( $(nproc) + 1 ))" 2>&1 | tee build.log || rc=${PIPESTATUS[0]}
           if [ "$rc" -ne 0 ]; then
             echo "::warning::并行编译失败（静默模式下失败包的报错被吞），用 -j1 V=s 重跑失败包捕获真实错误"
             FAILED=$(grep -oE "ERROR: \S+ failed to build( \(build variant: \S+\))?" build.log | awk '{print $2}' | sort -u || true)
             if [ -z "$FAILED" ]; then
               echo "未提取到失败包名，对全树 -j1 V=s 复现（到失败点即停）"
-              make -j1 V=s 2>&1 | tee error.log || true
+              make VERSION_DIST="xwrt-$(date +%Y%m%d)" -j1 V=s 2>&1 | tee error.log || true
             else
               for p in $FAILED; do
                 case "$p" in
