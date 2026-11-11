@@ -138,7 +138,6 @@ jobs:
             echo "CONFIG_TARGET_PER_DEVICE_ROOTFS=y"
             echo "CONFIG_TARGET_DEVICE_mediatek_filogic_DEVICE_${DEVICE}=y"
             for p in $PACKAGES; do echo "CONFIG_PACKAGE_${p}=y"; done
-            echo "CONFIG_VERSION_DIST=\"xwrt-$(date +%Y%m%d)\""
           } > .config
           make defconfig
 
@@ -167,13 +166,13 @@ jobs:
         run: |
           set -o pipefail
           nproc
-          make -j"$(( $(nproc) + 1 ))" 2>&1 | tee build.log
+          make VERSION_DIST="xwrt-$(date +%Y%m%d)" -j"$(( $(nproc) + 1 ))" 2>&1 | tee build.log
           rc=${PIPESTATUS[0]}
           if [ "$rc" -ne 0 ]; then
             echo "::warning::并行编译失败，用 -j1 V=s 重跑失败包捕获真实错误"
             FAILED=$(grep -oE "ERROR: \S+ failed to build( \(build variant: \S+\))?" build.log | awk '{print $2}' | sort -u || true)
             if [ -z "$FAILED" ]; then
-              make -j1 V=s 2>&1 | tee error.log || true
+              make VERSION_DIST="xwrt-$(date +%Y%m%d)" -j1 V=s 2>&1 | tee error.log || true
             else
               for p in $FAILED; do
                 case "$p" in
