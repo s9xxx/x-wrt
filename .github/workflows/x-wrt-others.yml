@@ -4,7 +4,8 @@ name: 🛠️ X-Wrt 其他平台（ramips/ath79/x86/rockchip/sunxi/bcm27xx…）
 # MTK 与 IPQ 由各自 workflow 负责，这里排除 mediatek / qualcommax / qualcommbe / ipq806x / ipq40xx
 on:
   schedule:
-    - cron: '0 2 * * 0'
+    # 每周二、周六 北京时间 11:00 = UTC 03:00
+    - cron: '0 3 * * 2,6'
   workflow_dispatch:
     inputs:
       groups:
@@ -400,7 +401,7 @@ jobs:
           PROTECTED: luci luci-base luci-compat base-files busybox
         run: |
           cat > gen_config.py <<'PY'
-          import os, re, sys
+          import os, re, sys, time
 
           conf = os.environ["CONF"]
           target = os.environ["TARGET"]
@@ -415,6 +416,8 @@ jobs:
               "CONFIG_TARGET_PER_DEVICE_ROOTFS=y",
               "CONFIG_DEVEL=y",
               "CONFIG_CCACHE=y",
+              # 产物名前缀：openwrt- → xwrt-<日期>（sanitize 后全小写，进入 IMG_PREFIX）
+              'CONFIG_VERSION_DIST="xwrt-%s"' % time.strftime("%Y%m%d"),
           ]
           lines += ["CONFIG_TARGET_DEVICE_%s_DEVICE_%s=y" % (conf, d) for d in want]
           lines += ["CONFIG_PACKAGE_%s=y" % p for p in pkgs]

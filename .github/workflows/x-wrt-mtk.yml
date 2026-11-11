@@ -3,7 +3,8 @@ name: 🛠️ X-Wrt MTK 全平台（MT7981/7986/7987/7988 + MT7622/7623/7629）
 # 每周三 10:00（北京时间）自动编译 = UTC 周三 02:00
 on:
   schedule:
-    - cron: '0 2 * * 3'
+    # 每周二、周六 北京时间 11:00 = UTC 03:00
+    - cron: '0 3 * * 2,6'
   workflow_dispatch:
     inputs:
       groups:
@@ -406,7 +407,7 @@ jobs:
           PROTECTED: luci luci-base luci-compat base-files busybox
         run: |
           cat > gen_config.py <<'PY'
-          import os, re, sys
+          import os, re, sys, time
 
           conf = os.environ["CONF"]
           target = os.environ["TARGET"]
@@ -422,6 +423,8 @@ jobs:
               "CONFIG_TARGET_PER_DEVICE_ROOTFS=y",
               "CONFIG_DEVEL=y",
               "CONFIG_CCACHE=y",
+              # 产物名前缀：openwrt- → xwrt-<日期>（sanitize 后全小写，进入 IMG_PREFIX）
+              'CONFIG_VERSION_DIST="xwrt-%s"' % time.strftime("%Y%m%d"),
           ]
           lines += ["CONFIG_TARGET_DEVICE_%s_DEVICE_%s=y" % (conf, d) for d in want]
           lines += ["CONFIG_PACKAGE_%s=y" % p for p in pkgs]

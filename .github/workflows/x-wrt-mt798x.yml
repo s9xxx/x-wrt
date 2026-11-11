@@ -3,7 +3,8 @@ name: 🛠️ X-Wrt MT798x (filogic) Build-cudy_tr3000-512mb-v1
 # 每周三早上 09:00（北京时间）自动编译 = UTC 周三 01:00
 on:
   schedule:
-    - cron: '0 1 * * 3'
+    # 每周二、周六 北京时间 11:00 = UTC 03:00
+    - cron: '0 3 * * 2,6'
   workflow_dispatch:
     inputs:
       device:
@@ -134,6 +135,7 @@ jobs:
           CONFIG_PACKAGE_luci=y
           CONFIG_DEVEL=y
           CONFIG_CCACHE=y
+          CONFIG_VERSION_DIST="xwrt-$(date +%Y%m%d)"
           EOF
 
           ok=0
